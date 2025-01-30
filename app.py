@@ -51,26 +51,57 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Fetch metadata from FastAPI
+def fetch_entities(endpoint):
+    try:
+        result = requests.get(f"{base_url}/api/entities/{endpoint}")
+        if result.status_code == 200:
+            return result.json()
+        else:
+            st.error(f"❌ Error: Could not fetch {endpoint} entities. Please check the API service.")
+            return None
+    except Exception as e:
+        st.error(f"❌ Error: {e}")
+        return None
+
+
+sex_entities = fetch_entities("sex")
+smoker_entities = fetch_entities("smoker")
+region_entities = fetch_entities("region")
+
 # User Inputs
 with st.form("user_input_form"):
     st.write("### User Details")
 
     age = st.number_input("👱‍♂️ Age:", min_value=0, max_value=120, value=30, step=1)
-    sex = st.radio("👬 Sex:", ["Female", "Male"], horizontal=True)
-    sex = 0 if sex == "Female" else 1
+
+    # sex input
+    if sex_entities:
+        sex_options = [item['label'] for item in sex_entities['sex']]
+        sex = st.radio("👬 Sex:", sex_options, horizontal=True)
+        sex = next(item['value'] for item in sex_entities['sex'] if item['label'] == sex)
+
     bmi = st.number_input("⚖️ BMI (Body Mass Index:", min_value=0.0, max_value=100.0, value=25.0, step=0.1)
     children = st.slider("👶 Number of Children:", min_value=0, max_value=10, value=0, step=1)
-    smoker = st.radio("🚬 Smoker:", ["No", "Yes"], horizontal=True)
-    smoker = 0 if smoker == "No" else 1
-    region = st.selectbox("📍 Region:", ["Northwest", "Southeast", "Southwest", "Northeast"])
 
-    northwest, southeast, southwest = 0, 0, 0
-    if region == "Northwest":
-        northwest = 1
-    elif region == "Southeast":
-        southeast = 1
-    elif region == "Southwest":
-        southwest = 1
+    # smoker input
+    if smoker_entities:
+        smoker_options = [item['label'] for item in smoker_entities['smoker']]
+        smoker = st.radio("👫 Smoker:", smoker_options, horizontal=True)
+        smoker = next(item['value'] for item in smoker_entities['smoker'] if item['label'] == smoker)
+
+    # region input
+    if region_entities:
+        region_options = [item['label'] for item in region_entities['region']]
+        region = st.selectbox("📍 Region:", region_options)
+
+        northwest, southeast, southwest = 0, 0, 0
+        if region == "Northwest":
+            northwest = 1
+        elif region == "Southeast":
+            southeast = 1
+        elif region == "Southwest":
+            southwest = 1
 
     # Submit button
     submitted = st.form_submit_button("Predict 🚀")
