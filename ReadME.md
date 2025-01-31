@@ -82,6 +82,6 @@ The project directory is structured as follows:
 ├─ app.py
 ├─ README.md
 └─ requirements.txt
-```
+```-
 ## License
 This project is licensed under [![License: MIT](https://img.shields.io/)

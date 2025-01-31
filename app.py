@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 # load environment variables from .env file
 load_dotenv()
 
-# Get the BASE_URL from the invironment variables
+# Get the BASE_URL from the environment variables
 base_url = os.getenv("BASE_URL", "http://localhost:8000")
 # Set page configuration
 st.set_page_config(
